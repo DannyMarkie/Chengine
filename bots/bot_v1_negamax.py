@@ -53,7 +53,7 @@ class NegaMaxV1(Bot):
         elif board.turn == Pieces.Black and len(whiteMoves) == 0:
             if board.is_checkmate(turn=Pieces.White):
                 return -1000000
-            else: return 0
+            else: return 0 
 
         mobility = len(whiteMoves) - len(blackMoves)
 

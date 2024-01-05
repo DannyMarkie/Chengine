@@ -35,3 +35,15 @@ class Pieces:
     BlackRook = Black | Rook
     BlackQueen = Black | Queen
     BlackKing = Black | King
+
+    def get_piece_value(self, piece):
+        if piece == Pieces.Pawn:
+            return self.Value.Pawn
+        if piece == Pieces.Bishop or piece == Pieces.Knight:
+            return self.Value.Bishop
+        if piece == Pieces.Rook:
+            return self.Value.Rook
+        if piece == Pieces.Queen:
+            return self.Value.Queen
+        if piece == Pieces.King:
+            return self.Value.King
