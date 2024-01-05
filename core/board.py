@@ -328,7 +328,12 @@ class Board:
         
         return False
 
-    def is_in_check(self, turn, board):
+    def is_in_check(self, turn=None, board=None):
+        if turn == None:
+            turn = self.turn
+        if board == None:
+            board = self.board
+
         bishopDirections = [-9, -7, 7, 9]
         rookDirections = [-8, -1, 1, 8]
         kingSquare = [index for index, piece in enumerate(board) if piece == turn | Pieces.King][0]
@@ -417,8 +422,10 @@ class Board:
                 file = int(nextSquare / 8)
         return False
 
-    def is_checkmate(self):
-        return (self.is_in_check(turn=self.turn, board=self.board) and len(self.generate_legal_moves()) == 0)
+    def is_checkmate(self, turn=None):
+        if turn == None:
+            turn = self.turn
+        return (self.is_in_check(turn=turn, board=self.board) and len(self.generate_legal_moves()) == 0)
 
     def generate_legal_moves(self, last_move=None, board=None, turn=None):
         if board is None:
