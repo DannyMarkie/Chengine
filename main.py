@@ -6,12 +6,14 @@ from bots.random_bot import RandomBot
 from tests.test_board import TestBoard
 import time
 
-numMatches = 10
+numMatches = 100
+renderGames = False
+
 winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=RandomBot(), bot2=RandomBot(), board=Board(render=False))
+    match = Match(bot1=RandomBot(), bot2=RandomBot(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()
