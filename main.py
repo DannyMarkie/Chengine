@@ -3,17 +3,18 @@ from core.pieces import Pieces
 from core.move import Move
 from core.match import Match
 from bots.random_bot import RandomBot
+from bots.negamax_v1 import NegaMaxV1
 from tests.test_board import TestBoard
 import time
 
-numMatches = 100
-renderGames = False
+numMatches = 1
+renderGames = True
 
 winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=RandomBot(), bot2=RandomBot(), board=Board(render=renderGames))
+    match = Match(bot1=NegaMaxV1(), bot2=NegaMaxV1(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()
