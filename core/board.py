@@ -240,58 +240,63 @@ class Board:
         self.board[move.endSquare] = move.capturedPiece
     
     def target_is_attacked(self, turn, board, targetSquare):
+        if turn == None:
+            turn = self.turn
+        if board == None:
+            board = self.board
+
         bishopDirections = [-9, -7, 7, 9]
         rookDirections = [-8, -1, 1, 8]
         row = int(targetSquare/8)
         col = targetSquare % 8
         # Check if knight can capture king
-        if int((targetSquare-10)/8) == row-1 and (targetSquare-10)%8 == col-2 and int((targetSquare-10)/8) >= 0 and board[targetSquare-10] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare-10)/8) == row-1 and (targetSquare-10)%8 == col-2 and int((targetSquare-10)/8) >= 0 and (targetSquare-10 >= 0 and targetSquare-10 < 64) and board[targetSquare-10] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 up 2 right
-        if int((targetSquare-6)/8) == row-1 and (targetSquare-6)%8 == col+2 and int((targetSquare-6)/8) >= 0 and board[targetSquare-6] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare-6)/8) == row-1 and (targetSquare-6)%8 == col+2 and int((targetSquare-6)/8) >= 0 and (targetSquare-6 >= 0 and targetSquare-6 < 64) and board[targetSquare-6] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 up 1 left
-        if int((targetSquare-17)/8) == row-2 and (targetSquare-17)%8 == col-1 and int((targetSquare-17)/8) >= 0 and board[targetSquare-17] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare-17)/8) == row-2 and (targetSquare-17)%8 == col-1 and int((targetSquare-17)/8) >= 0 and (targetSquare-17 >= 0 and targetSquare-17 < 64) and board[targetSquare-17] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 up 1 right
-        if int((targetSquare-15)/8) == row-2 and (targetSquare-15)%8 == col+1 and int((targetSquare-15)/8) >= 0 and board[targetSquare-15] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare-15)/8) == row-2 and (targetSquare-15)%8 == col+1 and int((targetSquare-15)/8) >= 0 and (targetSquare-15 >= 0 and targetSquare-15 < 64) and board[targetSquare-15] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 down 2 right
-        if int((targetSquare+10)/8) == row+1 and (targetSquare+10)%8 == col+2 and int((targetSquare+10)/8) < 8 and board[targetSquare+10] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare+10)/8) == row+1 and (targetSquare+10)%8 == col+2 and int((targetSquare+10)/8) < 8 and (targetSquare+10 >= 0 and targetSquare+10 < 64) and board[targetSquare+10] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 down 2 left
-        if int((targetSquare+6)/8) == row+1 and (targetSquare+6)%8 == col-2 and int((targetSquare+6)/8) < 8 and board[targetSquare+6] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare+6)/8) == row+1 and (targetSquare+6)%8 == col-2 and int((targetSquare+6)/8) < 8 and (targetSquare+6 >= 0 and targetSquare+6 < 64) and board[targetSquare+6] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 down 1 right
-        if int((targetSquare+17)/8) == row+2 and (targetSquare+17)%8 == col+1 and int((targetSquare+17)/8) < 8 and board[targetSquare+17] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare+17)/8) == row+2 and (targetSquare+17)%8 == col+1 and int((targetSquare+17)/8) < 8 and (targetSquare+17 >= 0 and targetSquare+17 < 64) and board[targetSquare+17] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 down 1 left
-        if int((targetSquare+15)/8) == row+2 and (targetSquare+15)%8 == col-1 and int((targetSquare+15)/8) < 8 and board[targetSquare+15] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((targetSquare+15)/8) == row+2 and (targetSquare+15)%8 == col-1 and int((targetSquare+15)/8) < 8 and (targetSquare+15 >= 0 and targetSquare+15 < 64) and board[targetSquare+15] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
-        
+
         # Check if pawn can capture king
         if turn == Pieces.Black:
             nextSquare = targetSquare+(7)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.WhitePawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.WhitePawn:
                 return True
             nextSquare = targetSquare+(9)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.WhitePawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.WhitePawn:
                 return True
             
         if turn == Pieces.White:
             nextSquare = targetSquare+(-7)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.BlackPawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.BlackPawn:
                 return True
             nextSquare = targetSquare+(-9)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.BlackPawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.BlackPawn:
                 return True
 
         # Check if bishop/queen/king can capture king diagonally
@@ -300,10 +305,10 @@ class Board:
             nextSquare = targetSquare+(direction*i)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i and abs(rank - col) == i)):
+            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i and abs(rank - col) == i) and (nextSquare >= 0 and nextSquare < 64)):
                 i += 1
                 if board[nextSquare] != Pieces.Empty:
-                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Bishop) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 1 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
+                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Bishop) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 2 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
                         return True
                     break
                 nextSquare = targetSquare+direction*i
@@ -316,17 +321,17 @@ class Board:
             nextSquare = targetSquare+(direction*i)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i or abs(rank - col) == i) and (abs(file - row) + abs(rank - col) == i)):
+            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i or abs(rank - col) == i) and (abs(file - row) + abs(rank - col) == i) and (nextSquare >= 0 and nextSquare < 64)):
                 i += 1
                 if board[nextSquare] != Pieces.Empty:
-                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Rook) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 1 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
+                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Rook) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 2 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
                         return True
                     break
                 nextSquare = targetSquare+direction*i
                 rank = (nextSquare) % 8
                 file = int(nextSquare / 8)
-        
         return False
+
 
     def is_in_check(self, turn=None, board=None):
         if turn == None:
