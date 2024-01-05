@@ -1,10 +1,22 @@
 from core.board import Board
 from core.pieces import Pieces
 from core.move import Move
+from core.match import Match
+from bots.random_bot import RandomBot
 from tests.test_board import TestBoard
 import time
 
-board = Board(fenString="r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - - 0 10", render=False)
-print(board.to_fen())
-TestBoard().perft(depth=4, board=board, verbose=True)
-time.sleep(2)
+numMatches = 10
+winners = []
+start_time = time.time()
+print(f"Started playing matches...")
+for game in range(0, numMatches):
+    match = Match(bot1=RandomBot(), bot2=RandomBot(), board=Board(render=False))
+    winner = match.play()
+    winners.append(winner)
+end_time = time.time()
+print(f"\nTime taken for {numMatches} matches = {end_time - start_time:0.2f}s")
+
+print(f"White wins: {len([winner for winner in winners if winner == Pieces.White])}")
+print(f"Draw: {len([winner for winner in winners if winner == None])}")
+print(f"Black wins: {len([winner for winner in winners if winner == Pieces.Black])}")
