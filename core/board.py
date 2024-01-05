@@ -335,28 +335,28 @@ class Board:
         row = int(kingSquare/8)
         col = kingSquare % 8
         # Check if knight can capture king
-        if int((kingSquare-10)/8) == row-1 and (kingSquare-10)%8 == col-2 and int((kingSquare-10)/8) >= 0 and board[kingSquare-10] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare-10)/8) == row-1 and (kingSquare-10)%8 == col-2 and int((kingSquare-10)/8) >= 0 and (kingSquare-10 >= 0 and kingSquare-10 < 64) and board[kingSquare-10] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 up 2 right
-        if int((kingSquare-6)/8) == row-1 and (kingSquare-6)%8 == col+2 and int((kingSquare-6)/8) >= 0 and board[kingSquare-6] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare-6)/8) == row-1 and (kingSquare-6)%8 == col+2 and int((kingSquare-6)/8) >= 0 and (kingSquare-6 >= 0 and kingSquare-6 < 64) and board[kingSquare-6] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 up 1 left
-        if int((kingSquare-17)/8) == row-2 and (kingSquare-17)%8 == col-1 and int((kingSquare-17)/8) >= 0 and board[kingSquare-17] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare-17)/8) == row-2 and (kingSquare-17)%8 == col-1 and int((kingSquare-17)/8) >= 0 and (kingSquare-17 >= 0 and kingSquare-17 < 64) and board[kingSquare-17] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 up 1 right
-        if int((kingSquare-15)/8) == row-2 and (kingSquare-15)%8 == col+1 and int((kingSquare-15)/8) >= 0 and board[kingSquare-15] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare-15)/8) == row-2 and (kingSquare-15)%8 == col+1 and int((kingSquare-15)/8) >= 0 and (kingSquare-15 >= 0 and kingSquare-15 < 64) and board[kingSquare-15] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 down 2 right
-        if int((kingSquare+10)/8) == row+1 and (kingSquare+10)%8 == col+2 and int((kingSquare+10)/8) < 8 and board[kingSquare+10] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare+10)/8) == row+1 and (kingSquare+10)%8 == col+2 and int((kingSquare+10)/8) < 8 and (kingSquare+10 >= 0 and kingSquare+10 < 64) and board[kingSquare+10] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 1 down 2 left
-        if int((kingSquare+6)/8) == row+1 and (kingSquare+6)%8 == col-2 and int((kingSquare+6)/8) < 8 and board[kingSquare+6] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare+6)/8) == row+1 and (kingSquare+6)%8 == col-2 and int((kingSquare+6)/8) < 8 and (kingSquare+6 >= 0 and kingSquare+6 < 64) and board[kingSquare+6] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 down 1 right
-        if int((kingSquare+17)/8) == row+2 and (kingSquare+17)%8 == col+1 and int((kingSquare+17)/8) < 8 and board[kingSquare+17] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare+17)/8) == row+2 and (kingSquare+17)%8 == col+1 and int((kingSquare+17)/8) < 8 and (kingSquare+17 >= 0 and kingSquare+17 < 64) and board[kingSquare+17] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
         # 2 down 1 left
-        if int((kingSquare+15)/8) == row+2 and (kingSquare+15)%8 == col-1 and int((kingSquare+15)/8) < 8 and board[kingSquare+15] == ~turn & Pieces.colorMask | Pieces.Knight:
+        if int((kingSquare+15)/8) == row+2 and (kingSquare+15)%8 == col-1 and int((kingSquare+15)/8) < 8 and (kingSquare+15 >= 0 and kingSquare+15 < 64) and board[kingSquare+15] == ~turn & Pieces.colorMask | Pieces.Knight:
             return True
 
         # Check if pawn can capture king
@@ -364,24 +364,24 @@ class Board:
             nextSquare = kingSquare+(7)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.WhitePawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.WhitePawn:
                 return True
             nextSquare = kingSquare+(9)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.WhitePawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.WhitePawn:
                 return True
             
         if turn == Pieces.White:
             nextSquare = kingSquare+(-7)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.BlackPawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.BlackPawn:
                 return True
             nextSquare = kingSquare+(-9)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            if (abs(file - row) == 1 and abs(rank - col) == 1) and board[nextSquare] == Pieces.BlackPawn:
+            if (abs(file - row) == 1 and abs(rank - col) == 1) and (nextSquare >= 0 and nextSquare < 64) and board[nextSquare] == Pieces.BlackPawn:
                 return True
 
         # Check if bishop/queen/king can capture king diagonally
@@ -390,10 +390,10 @@ class Board:
             nextSquare = kingSquare+(direction*i)
             rank = nextSquare % 8
             file = int(nextSquare / 8)
-            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i and abs(rank - col) == i)):
+            while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i and abs(rank - col) == i) and (nextSquare >= 0 and nextSquare < 64)):
                 i += 1
                 if board[nextSquare] != Pieces.Empty:
-                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Bishop) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 1 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
+                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Bishop) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 2 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
                         return True
                     break
                 nextSquare = kingSquare+direction*i
@@ -409,7 +409,7 @@ class Board:
             while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - row) == i or abs(rank - col) == i) and (abs(file - row) + abs(rank - col) == i) and (nextSquare >= 0 and nextSquare < 64)):
                 i += 1
                 if board[nextSquare] != Pieces.Empty:
-                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Rook) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 1 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
+                    if (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Rook) or (board[nextSquare] == ~turn & Pieces.colorMask | Pieces.Queen) or (i == 2 and board[nextSquare] == ~turn & Pieces.colorMask | Pieces.King):
                         return True
                     break
                 nextSquare = kingSquare+direction*i
