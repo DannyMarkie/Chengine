@@ -36,55 +36,8 @@ class NegaMaxV1(Bot):
             if beta <= alpha:
                 break
         return bestMove, bestEval
-        
-        # if isMaximizingPlayer == 1:
-        #     bestEval = -1000000
-        #     bestMove = lastMove
-        #     for move in board.generate_legal_moves():
-        #         board.move_piece(move)
-        #         if board.is_in_check():
-        #             extension += 1
-        #         if move.capturedPiece != Pieces.Empty:
-        #             extension += 1
-        #         thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
-        #         evaluation = -evaluation
-        #         bestEval = max(bestEval, evaluation)
-        #         if bestEval == evaluation:
-        #             bestMove = move
-        #         alpha = max(alpha, bestEval)
-        #         board.undo_move(move)
-        #         extension = 0
-        #         if beta <= alpha:
-        #             break
-        #     return bestMove, bestEval
-        
-        # else:
-        #     bestEval = 1000000
-        #     bestMove = lastMove
-        #     for move in board.generate_legal_moves():
-        #         board.move_piece(move)
-        #         if board.is_in_check():
-        #             extension += 1
-        #         if move.capturedPiece != Pieces.Empty:
-        #             extension += 1
-        #         thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
-        #         evaluation = -evaluation
-        #         bestEval = min(bestEval, evaluation)
-        #         if bestEval == evaluation:
-        #             bestMove = move
-        #         beta = min(beta, bestEval)
-        #         board.undo_move(move)
-        #         extension = 0
-        #         if beta <= alpha:
-        #             break
-        #     return bestMove, bestEval
     
     def evaluate(self, board):
-        if board.turn == Pieces.White and board.is_checkmate(turn=Pieces.Black):
-            return 1000000
-        elif board.turn == Pieces.Black and board.is_checkmate(turn=Pieces.White):
-            return -1000000
-
         evaluation = 0
         if board.turn == Pieces.White:
             whiteMoves = board.generate_legal_moves()
@@ -92,6 +45,15 @@ class NegaMaxV1(Bot):
         else:
             blackMoves = board.generate_legal_moves()
             whiteMoves = board.generate_legal_moves(turn=Pieces.White)
+
+        if board.turn == Pieces.White and len(blackMoves) == 0:
+            if board.is_checkmate(turn=Pieces.Black):
+                return 1000000
+            else: return 0
+        elif board.turn == Pieces.Black and len(whiteMoves) == 0:
+            if board.is_checkmate(turn=Pieces.White):
+                return -1000000
+            else: return 0
 
         mobility = len(whiteMoves) - len(blackMoves)
 
