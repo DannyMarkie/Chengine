@@ -332,7 +332,6 @@ class Board:
                 file = int(nextSquare / 8)
         return False
 
-
     def is_in_check(self, turn=None, board=None):
         if turn == None:
             turn = self.turn
@@ -838,7 +837,45 @@ class Board:
     
     def exitWindow(self):
         pygame.quit()
+    
+    def from_algebraic(self, string):
+        files = "abcdefgh"
+        endSquare = 0
+        startSquare = 0
+        move = Move()
+        # Handle basic pawn move
+        if (string[0].lower() in files and string[1].isnumeric()):
+            rank = 8 - int(string[1]) + 1 
+            file = files.index(string[0])
+            endSquare = rank * 8 + file
+            moves = self.generate_legal_moves()
+            for move in moves:
+                if move.endSquare == endSquare and move.movedPiece & Pieces.pieceMask == Pieces.Pawn:
+                    return move
+                
+        # Handle Knight moves
+        if string[0].lower() == 'n':
+            if string[1] in files and string[2].isnumeric():
+                rank = 8 - int(string[2]) + 1 
+                file = files.index(string[1])
+                endSquare = rank * 8 + file
+                moves = self.generate_legal_moves()
+                for move in moves:
+                    if move.endSquare == endSquare and move.movedPiece & Pieces.pieceMask == Pieces.Knight:
+                        return move
+            elif string[1] in files and string[2] in files and string[3].isnumeric():
+                rank = 8 - int(string[2]) + 1 
+                file = files.index(string[1])
+                endSquare = rank * 8 + file
+                moves = self.generate_legal_moves()
+                for move in moves:
+                    if move.endSquare == endSquare and move.movedPiece & Pieces.pieceMask == Pieces.Knight:
+                        return move
 
+
+        # move = Move(startSquare=startSquare, endSquare=endSquare, movedPiece=self.board[startSquare], capturedPiece=self.board[endSquare])
+        return move
+    
     def __str__(self) -> str:
         stringified = "\n"
         for index, entry in enumerate(self.board):

@@ -15,7 +15,7 @@ winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=MoveOrderingV2(), bot2=NegaMaxV1(), board=Board(render=renderGames))
+    match = Match(bot1=MoveOrderingV2(), bot2=MoveOrderingV2(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()
