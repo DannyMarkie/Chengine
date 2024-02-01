@@ -1,11 +1,11 @@
 class Pieces:
     class Value:
-        Pawn = 1
-        Bishop = 3
-        Knight = 3
-        Rook = 5
-        Queen = 9
-        King = 200
+        Pawn = 100
+        Bishop = 330
+        Knight = 320
+        Rook = 500
+        Queen = 900
+        King = 20000
 
     pieceMask = 0b00111
     colorMask = 0b11000

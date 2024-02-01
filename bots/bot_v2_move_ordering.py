@@ -84,7 +84,7 @@ class MoveOrderingV2(Bot):
         # print(0.1*mobility, evaluation)
         evaluation += (0.1 * mobility)
         
-        return evaluation
+        return evaluation / 100
     
     def order_moves(self, moves, board):
         scoreGuesses = [0 for move in moves]
