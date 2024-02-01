@@ -4,7 +4,64 @@ from core.move import Move
 from core.board import Board
 import time
 
-class IterativeDeepeningV3(Bot):
+class PieceTablesV4(Bot):
+    pawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
+                    50, 50, 50, 50, 50, 50, 50, 50,
+                    10, 10, 20, 30, 30, 20, 10, 10,
+                    5,  5, 10, 25, 25, 10,  5,  5,
+                    0,  0,  0, 20, 20,  0,  0,  0,
+                    5, -5,-10,  0,  0,-10, -5,  5,
+                    5, 10, 10,-20,-20, 10, 10,  5,
+                    0,  0,  0,  0,  0,  0,  0,  0   ]
+    knightTable = [ -50,-40,-30,-30,-30,-30,-40,-50,
+                    -40,-20,  0,  0,  0,  0,-20,-40,
+                    -30,  0, 10, 15, 15, 10,  0,-30,
+                    -30,  5, 15, 20, 20, 15,  5,-30,
+                    -30,  0, 15, 20, 20, 15,  0,-30,
+                    -30,  5, 10, 15, 15, 10,  5,-30,
+                    -40,-20,  0,  5,  5,  0,-20,-40,
+                    -50,-40,-30,-30,-30,-30,-40,-50]
+    bishopTable = [ -20,-10,-10,-10,-10,-10,-10,-20,
+                    -10,  0,  0,  0,  0,  0,  0,-10,
+                    -10,  0,  5, 10, 10,  5,  0,-10,
+                    -10,  5,  5, 10, 10,  5,  5,-10,
+                    -10,  0, 10, 10, 10, 10,  0,-10,
+                    -10, 10, 10, 10, 10, 10, 10,-10,
+                    -10,  5,  0,  0,  0,  0,  5,-10,
+                    -20,-10,-10,-10,-10,-10,-10,-20,]
+    rookTable = [   0,  0,  0,  0,  0,  0,  0,  0,
+                    5, 10, 10, 10, 10, 10, 10,  5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    -5,  0,  0,  0,  0,  0,  0, -5,
+                    0,  0,  0,  5,  5,  0,  0,  0   ]
+    queenTable = [  -20,-10,-10, -5, -5,-10,-10,-20,
+                    -10,  0,  0,  0,  0,  0,  0,-10,
+                    -10,  0,  5,  5,  5,  5,  0,-10,
+                    -5,  0,  5,  5,  5,  5,  0, -5,
+                    0,  0,  5,  5,  5,  5,  0, -5,
+                    -10,  5,  5,  5,  5,  5,  0,-10,
+                    -10,  0,  5,  0,  0,  0,  0,-10,
+                    -20,-10,-10, -5, -5,-10,-10,-20 ]
+    mgKingTable = [ -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -30,-40,-40,-50,-50,-40,-40,-30,
+                    -20,-30,-30,-40,-40,-30,-30,-20,
+                    -10,-20,-20,-20,-20,-20,-20,-10,
+                    20, 20,  0,  0,  0,  0, 20, 20,
+                    20, 30, 10,  0,  0, 10, 30, 20  ]
+    egKingTable = [ -50,-40,-30,-20,-20,-30,-40,-50,
+                    -30,-20,-10,  0,  0,-10,-20,-30,
+                    -30,-10, 20, 30, 30, 20,-10,-30,
+                    -30,-10, 30, 40, 40, 30,-10,-30,
+                    -30,-10, 30, 40, 40, 30,-10,-30,
+                    -30,-10, 20, 30, 30, 20,-10,-30,
+                    -30,-30,  0,  0,  0,  0,-30,-30,
+                    -50,-30,-30,-30,-30,-30,-30,-50 ]
+
     def __init__(self, thinkTime=1) -> None:
         self.thinkTime = thinkTime
         super().__init__()
@@ -86,25 +143,25 @@ class IterativeDeepeningV3(Bot):
 
         mobility = len(whiteMoves) - len(blackMoves)
 
-        for piece in board.board:
+        for index, piece in enumerate(board.board):
             if piece & Pieces.pieceMask == Pieces.Pawn:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.Pawn
+                evaluation += offset * (Pieces.Value.Pawn + self.pawnTable[index]) if offset == 1 else offset * (Pieces.Value.Pawn + self.pawnTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Knight:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.Knight
+                evaluation += offset * (Pieces.Value.Knight + self.knightTable[index]) if offset == 1 else offset * (Pieces.Value.Knight + self.knightTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Bishop:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.Bishop
+                evaluation += offset * (Pieces.Value.Bishop + self.bishopTable[index]) if offset == 1 else offset * (Pieces.Value.Bishop + self.bishopTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Rook:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.Rook
+                evaluation += offset * (Pieces.Value.Rook + self.rookTable[index]) if offset == 1 else offset * (Pieces.Value.Rook + self.rookTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Queen:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.Queen
+                evaluation += offset * (Pieces.Value.Queen + self.queenTable[index]) if offset == 1 else offset * (Pieces.Value.Queen + self.queenTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.King:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * Pieces.Value.King
+                evaluation += offset * (Pieces.Value.King + self.mgKingTable[index]) if offset == 1 else offset * (Pieces.Value.King + self.mgKingTable[::-1][index])
 
         evaluation += (0.1 * mobility)
         

@@ -80,4 +80,4 @@ class NegaMaxV1(Bot):
         # print(0.1*mobility, evaluation)
         evaluation += (0.05 * mobility)
         
-        return evaluation
+        return evaluation / 100
