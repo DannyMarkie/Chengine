@@ -5,6 +5,7 @@ from core.match import Match
 from bots.random_bot import RandomBot
 from bots.bot_v1_negamax import NegaMaxV1
 from bots.bot_v2_move_ordering import MoveOrderingV2
+from bots.bot_v3_iterative_deepening import IterativeDeepeningV3
 from tests.test_board import TestBoard
 import time
 
@@ -15,7 +16,7 @@ winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=MoveOrderingV2(), bot2=NegaMaxV1(), board=Board(render=renderGames))
+    match = Match(bot1=IterativeDeepeningV3(), bot2=IterativeDeepeningV3(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()

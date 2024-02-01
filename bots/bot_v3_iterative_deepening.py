@@ -5,16 +5,26 @@ from core.board import Board
 import time
 
 class IterativeDeepeningV3(Bot):
-    def __init__(self) -> None:
+    def __init__(self, thinkTime=1) -> None:
+        self.thinkTime = thinkTime
         super().__init__()
 
     def get_move(self, board):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
-        move, evaluation = self.search(board=board, maxDepth=2, isMaximizingPlayer=isMaximizingPlayer)
-        print(move.startSquare, evaluation)
+        currentDepth = 1
+        startTime = time.time()
+        move = None
+        while time.time() - self.thinkTime < startTime:
+            print(currentDepth)
+            if move is not None:
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
+            else:
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer)
+            currentDepth += 1
+        print(evaluation*isMaximizingPlayer)
         return move
 
-    def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000):
+    def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
         extension = 0
         if depth == maxDepth or depth == maxDepthExtension:
             evaluation = isMaximizingPlayer * self.evaluate(board=board)
@@ -24,13 +34,27 @@ class IterativeDeepeningV3(Bot):
         bestMove = lastMove
         moves = board.generate_legal_moves()
         sorted_moves = self.order_moves(moves=moves, board=board)
+        if prevBestMove is not None:
+            board.move_piece(prevBestMove)
+            if board.is_in_check():
+                extension += 1
+            if prevBestMove.capturedPiece != Pieces.Empty:
+                extension += 1
+            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=prevBestMove)
+            evaluation = -evaluation
+            bestEval = max(bestEval, evaluation)
+            if bestEval == evaluation:
+                bestMove = prevBestMove
+            alpha = max(alpha, bestEval)
+            board.undo_move(prevBestMove)
+            extension = 0
         for move in sorted_moves:
             board.move_piece(move)
             if board.is_in_check():
                 extension += 1
             if move.capturedPiece != Pieces.Empty:
                 extension += 1
-            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
+            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
             evaluation = -evaluation
             bestEval = max(bestEval, evaluation)
             if bestEval == evaluation:
@@ -41,15 +65,6 @@ class IterativeDeepeningV3(Bot):
             if beta <= alpha:
                 break
         return bestMove, bestEval
-    
-    def search(self, board, startTime=time.time(), depth=0):
-        while time.time() - 3 < startTime:
-            moves = board.generate_legal_moves()
-            sortedMoves = self.order_moves(moves=moves, board= board)
-            if depth > 0:
-                for move in sortedMoves:
-                    board.move_piece(move)
-                    thisMove, evaluation = self.search(board=board, startTime=startTime, depth=depth-1)
     
     def evaluate(self, board):
         evaluation = 0
@@ -91,7 +106,6 @@ class IterativeDeepeningV3(Bot):
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
                 evaluation += offset * Pieces.Value.King
 
-        # print(0.1*mobility, evaluation)
         evaluation += (0.1 * mobility)
         
         return evaluation
