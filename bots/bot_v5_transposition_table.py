@@ -96,7 +96,7 @@ class TranspositionTableV5(Bot):
             else:
                 move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+3, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
-        print(f"Eval: {evaluation*isMaximizingPlayer:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nPruned Trees: {self.prunedTrees}\nHash Lookups: {self.hashLookups}")
+        print(f"Eval: {evaluation:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nHash Lookups: {self.hashLookups}")
         return move
 
     def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
