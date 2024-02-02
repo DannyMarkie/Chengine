@@ -7,17 +7,17 @@ class NegaMaxV1(Bot):
 
     def get_move(self, board):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
-        move, evaluation = self.search(board=board, maxDepth=2, isMaximizingPlayer=isMaximizingPlayer)
-        print(move.startSquare, evaluation)
+        move, evaluation = self.search(board=board, maxDepth=4, isMaximizingPlayer=isMaximizingPlayer)
+        print(move.startSquare, evaluation*isMaximizingPlayer)
         return move
 
     def search(self, board, maxDepth, depth=0, maxExtendedDepth=3, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000):
         extension = 0
         if depth == maxDepth or depth == maxExtendedDepth:
-            evaluation = isMaximizingPlayer * self.evaluate(board=board)
+            evaluation = self.evaluate(board=board)
             return lastMove, evaluation
         
-        bestEval = -1000000
+        bestEval = -1000000 if isMaximizingPlayer == 1 else 1000000
         bestMove = lastMove
         for move in board.generate_legal_moves():
             board.move_piece(move)
@@ -26,15 +26,20 @@ class NegaMaxV1(Bot):
             if move.capturedPiece != Pieces.Empty:
                 extension += 1
             thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
-            evaluation = -evaluation
-            bestEval = max(bestEval, evaluation)
-            if bestEval == evaluation:
-                bestMove = move
-            alpha = max(alpha, bestEval)
             board.undo_move(move)
             extension = 0
-            if beta <= alpha:
-                break
+            if isMaximizingPlayer == 1:
+                bestEval = max(bestEval, evaluation)
+                if bestEval > beta:
+                    break
+                alpha = max(alpha, bestEval)
+            else:
+                bestEval = min(bestEval, evaluation)
+                if bestEval < alpha:
+                    break
+                beta = min(beta, bestEval)
+            if bestEval == evaluation:
+                bestMove = move
         return bestMove, bestEval
     
     def evaluate(self, board):
