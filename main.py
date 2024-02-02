@@ -7,6 +7,7 @@ from bots.bot_v1_negamax import NegaMaxV1
 from bots.bot_v2_move_ordering import MoveOrderingV2
 from bots.bot_v3_iterative_deepening import IterativeDeepeningV3
 from bots.bot_v4_piece_tables import PieceTablesV4
+from bots.bot_v5_transposition_table import TranspositionTableV5
 from tests.test_board import TestBoard
 import time
 
@@ -17,7 +18,7 @@ winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=PieceTablesV4(), bot2=IterativeDeepeningV3(), board=Board(render=renderGames))
+    match = Match(bot1=TranspositionTableV5(), bot2=TranspositionTableV5(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()
