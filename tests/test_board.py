@@ -1,5 +1,6 @@
 import sys
 sys.path.insert(1, 'C:/Users/Danny/Documents/Programming/ai/games/pythonChess')
+# sys.path.insert(1, 'C:/Users/danny/Documents/Programming/ChEngine/Chengine')
 
 from core.board import Board
 from core.pieces import Pieces
