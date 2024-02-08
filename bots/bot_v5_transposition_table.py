@@ -63,7 +63,7 @@ class TranspositionTableV5(Bot):
                     -30,-30,  0,  0,  0,  0,-30,-30,
                     -50,-30,-30,-30,-30,-30,-30,-50 ]
 
-    def __init__(self, thinkTime=0.7) -> None:
+    def __init__(self, thinkTime=2) -> None:
         self.thinkTime = thinkTime
         self.zobrist = self.init_zobrist()
         self.mask = 0xFFFF_FFFF

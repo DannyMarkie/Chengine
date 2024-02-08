@@ -65,7 +65,7 @@ class KillerMovesV6(Bot):
                     -30,-30,  0,  0,  0,  0,-30,-30,
                     -50,-30,-30,-30,-30,-30,-30,-50 ]
 
-    def __init__(self, thinkTime=0.7) -> None:
+    def __init__(self, thinkTime=2) -> None:
         self.thinkTime = thinkTime
         self.zobrist = self.init_zobrist()
         self.mask = 0xFFFF_FFFF
@@ -94,9 +94,9 @@ class KillerMovesV6(Bot):
             self.prunedTrees = 0
             self.hashLookups = 0
             if move is not None:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+3, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+2, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
             else:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+3, isMaximizingPlayer=isMaximizingPlayer)
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+2, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
         print(f"Eval: {evaluation:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nHash Lookups: {self.hashLookups}")
         return move
@@ -214,9 +214,6 @@ class KillerMovesV6(Bot):
     def order_moves(self, moves, board):
         scoreGuesses = [0 for move in moves]
         for index, move in enumerate(moves):
-            if not board.move_is_legal(move, board):
-                scoreGuesses[index] -= 10000
-                continue
             if move in self.killerMoves:
                 scoreGuesses[index] -= self.killerBias
             if move.capturedPiece != Pieces.Empty:
