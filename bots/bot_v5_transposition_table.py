@@ -63,7 +63,7 @@ class TranspositionTableV5(Bot):
                     -30,-30,  0,  0,  0,  0,-30,-30,
                     -50,-30,-30,-30,-30,-30,-30,-50 ]
 
-    def __init__(self, thinkTime=1) -> None:
+    def __init__(self, thinkTime=0.7) -> None:
         self.thinkTime = thinkTime
         self.zobrist = self.init_zobrist()
         self.mask = 0xFFFF_FFFF
@@ -81,7 +81,7 @@ class TranspositionTableV5(Bot):
                 h ^= self.zobrist[index][piece]
         return h
 
-    def get_move(self, board):
+    def get_move(self, board=Board()):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
         currentDepth = 1
         startTime = time.time()
@@ -92,9 +92,9 @@ class TranspositionTableV5(Bot):
             self.prunedTrees = 0
             self.hashLookups = 0
             if move is not None:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+3, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+2, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
             else:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+3, isMaximizingPlayer=isMaximizingPlayer)
+                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+2, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
         print(f"Eval: {evaluation:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nHash Lookups: {self.hashLookups}")
         return move
@@ -130,6 +130,8 @@ class TranspositionTableV5(Bot):
             if bestEval == evaluation:
                 bestMove = prevBestMove
         for move in sorted_moves:
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             hashValue ^= self.zobrist[move.startSquare][board.board[move.startSquare]]
             hashValue ^= self.zobrist[move.endSquare][board.board[move.endSquare]]

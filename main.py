@@ -11,15 +11,18 @@ from bots.bot_v5_transposition_table import TranspositionTableV5
 from bots.bot_v6_killer_moves import KillerMovesV6
 from tests.test_board import TestBoard
 import time
+import cProfile
 
 numMatches = 1
 renderGames = True
 
 winners = []
+# cProfile.run('KillerMovesV6().get_move()', sort='tottime')
+# cProfile.run('TranspositionTableV5().get_move()', sort='tottime')
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=KillerMovesV6(), bot2=TranspositionTableV5(), board=Board(render=renderGames))
+    match = Match(bot1=TranspositionTableV5(), bot2=RandomBot(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()

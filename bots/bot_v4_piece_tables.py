@@ -106,6 +106,8 @@ class PieceTablesV4(Bot):
             board.undo_move(prevBestMove)
             extension = 0
         for move in sorted_moves:
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             if board.is_in_check():
                 extension += 1

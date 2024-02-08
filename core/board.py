@@ -239,6 +239,32 @@ class Board:
         self.board[move.startSquare] = self.board[move.endSquare]
         self.board[move.endSquare] = move.capturedPiece
     
+    def move_is_legal(self, move, board=None):
+        if board == None:
+            board = self.board
+
+        board.move_piece(move)
+        if not self.is_in_check(~board.turn & Pieces.colorMask, self.board):
+            board.undo_move(move)
+            return True
+        board.undo_move(move)
+        return False
+
+    def has_legal_moves(self, board=None):
+        if board == None:
+            board = self
+
+        moves = board.generate_legal_moves(board=board.board)
+        indexes = []
+        for index, move in enumerate(moves):
+            if not board.move_is_legal(move, board):
+                indexes.append(index)
+
+        for index in sorted(indexes, reverse=True):
+            del moves[index]
+
+        return not (len(moves) == 0)
+
     def target_is_attacked(self, turn, board, targetSquare):
         if turn == None:
             turn = self.turn
@@ -332,7 +358,6 @@ class Board:
                 file = int(nextSquare / 8)
         return False
 
-
     def is_in_check(self, turn=None, board=None):
         if turn == None:
             turn = self.turn
@@ -341,7 +366,7 @@ class Board:
 
         bishopDirections = [-9, -7, 7, 9]
         rookDirections = [-8, -1, 1, 8]
-        kingSquare = [index for index, piece in enumerate(board) if piece == turn | Pieces.King][0]
+        kingSquare = board.index(turn | Pieces.King)
         row = int(kingSquare/8)
         col = kingSquare % 8
         # Check if knight can capture king
@@ -430,7 +455,7 @@ class Board:
     def is_checkmate(self, turn=None):
         if turn == None:
             turn = self.turn
-        return (self.is_in_check(turn=turn, board=self.board) and len(self.generate_legal_moves()) == 0)
+        return (self.is_in_check(turn=turn, board=self.board) and self.has_legal_moves())
 
     def generate_legal_moves(self, last_move=None, board=None, turn=None):
         if board is None:
@@ -476,22 +501,20 @@ class Board:
                 if board[index - 8] == Pieces.Empty:
                     move = Move(index, index-8, Pieces.Pawn, board[index-8])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 0:
+                    if not file == 0:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 0:
                         for promoted in promotionPieces:
                             move = Move(index, index-8, promoted, board[index-8], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                     # If Pawn hasnt moved yet, check for 2 squares ahead
                     if index > 47 and index < 56 and board[index - 16] == Pieces.Empty:
                         move = Move(index, index-16, Pieces.Pawn, board[index-16])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 # Check for captures
                 nextSquare = index+(-7)
@@ -500,15 +523,14 @@ class Board:
                 if (abs(file - startFile) == 1 and abs(rank - startRank) == 1) and board[index-7] & Pieces.colorMask == Pieces.Black:
                     move = Move(index, index-7, Pieces.Pawn, board[index-7])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 0:
+                    if not file == 0:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 0:
                         for promoted in promotionPieces:
                             move = Move(index, index-7, promoted, board[index-7], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                 nextSquare = index+(-9)
                 rank = nextSquare % 8
@@ -516,15 +538,14 @@ class Board:
                 if (abs(file - startFile) == 1 and abs(rank - startRank) == 1) and board[index-9] & Pieces.colorMask == Pieces.Black:
                     move = Move(index, index-9, Pieces.Pawn, board[index-9])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 0:
+                    if not file == 0:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 0:
                         for promoted in promotionPieces:
                             move = Move(index, index-9, promoted, board[index-9], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                 # En Passant
                 # If other pawn made double step resulting in end position being next to this pawn, allow capturing as if other pawn only moved one square
@@ -532,8 +553,7 @@ class Board:
                     if last_move.movedPiece == Pieces.Pawn and (last_move.endSquare == index-1 or last_move.endSquare == index+1) and last_move.startSquare == last_move.endSquare-16 and int(index/8) == int(last_move.endSquare/8):
                         move = Move(index, index - 8 + (last_move.endSquare - index), Pieces.Pawn, board[index - 8 + (last_move.endSquare - index)], Move.Flag.en_passant)
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 continue
             elif piece == Pieces.BlackPawn and turn == Pieces.Black:
@@ -544,22 +564,20 @@ class Board:
                 if board[index + 8] == Pieces.Empty:
                     move = Move(index, index+8, Pieces.Pawn, board[index+8])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 7:
+                    if not file == 7:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 7:
                         for promoted in promotionPieces:
                             move = Move(index, index+8, promoted, board[index+8], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                     # If Pawn hasnt moved yet, check for 2 squares ahead
                     if index > 7 and index < 16 and board[index + 16] == Pieces.Empty:
                         move = Move(index, index+16, Pieces.Pawn, board[index+16])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 # Check for captures
                 nextSquare = index+(7)
@@ -568,15 +586,14 @@ class Board:
                 if (abs(file - startFile) == 1 and abs(rank - startRank) == 1) and board[index+7] & Pieces.colorMask == Pieces.White:
                     move = Move(index, index+7, Pieces.Pawn, board[index+7])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 7:
+                    if not file == 7:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 7:
                         for promoted in promotionPieces:
                             move = Move(index, index+7, promoted, board[index+7], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                 nextSquare = index+(9)
                 rank = nextSquare % 8
@@ -584,23 +601,21 @@ class Board:
                 if (abs(file - startFile) == 1 and abs(rank - startRank) == 1) and board[index+9] & Pieces.colorMask == Pieces.White:
                     move = Move(index, index+9, Pieces.Pawn, board[index+9])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board) and not file == 7:
+                    if not file == 7:
                         moves.append(move)
                     self.undo_move(move)
                     if file == 7:
                         for promoted in promotionPieces:
                             move = Move(index, index+9, promoted, board[index+9], flag=Move.Flag.promote)
                             self.move_piece(move)
-                            if not self.is_in_check(turn, self.board):
-                                moves.append(move)
+                            moves.append(move)
                             self.undo_move(move)
                 # En Passant
                 if last_move is not None: 
                     if last_move.movedPiece == Pieces.Pawn and (last_move.endSquare == index-1 or last_move.endSquare == index+1) and last_move.startSquare == last_move.endSquare+16 and int(index/8) == int(last_move.endSquare/8):
                         move = Move(index, index + 8 + (last_move.endSquare - index), Pieces.Pawn, board[index + 8 + (last_move.endSquare - index)], Move.Flag.en_passant)
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 continue
 # ______________________________________________________________________________________________________ #
@@ -612,57 +627,49 @@ class Board:
                 if int((index-10)/8) == row-1 and (index-10)%8 == col-2 and int((index-10)/8) >= 0 and Pieces.colorMask & board[index-10] != turn and (index-10 >= 0 and index-10 < 64):
                     move = Move(index, index-10, Pieces.Knight, board[index-10])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 1 up 2 right
                 if int((index-6)/8) == row-1 and (index-6)%8 == col+2 and int((index-6)/8) >= 0 and Pieces.colorMask & board[index-6] != turn and (index-6 >= 0 and index-6 < 64):
                     move = Move(index, index-6, Pieces.Knight, board[index-6])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 2 up 1 left
                 if int((index-17)/8) == row-2 and (index-17)%8 == col-1 and int((index-17)/8) >= 0 and Pieces.colorMask & board[index-17] != turn and (index-17 >= 0 and index-17 < 64):
                     move = Move(index, index-17, Pieces.Knight, board[index-17])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 2 up 1 right
                 if int((index-15)/8) == row-2 and (index-15)%8 == col+1 and int((index-15)/8) >= 0 and Pieces.colorMask & board[index-15] != turn and (index-15 >= 0 and index-15 < 64):
                     move = Move(index, index-15, Pieces.Knight, board[index-15])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 1 down 2 right
                 if int((index+10)/8) == row+1 and (index+10)%8 == col+2 and int((index+10)/8) < 8 and Pieces.colorMask & board[index+10] != turn and (index+10 >= 0 and index+10 < 64):
                     move = Move(index, index+10, Pieces.Knight, board[index+10])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 1 down 2 left
                 if int((index+6)/8) == row+1 and (index+6)%8 == col-2 and int((index+6)/8) < 8 and Pieces.colorMask & board[index+6] != turn and (index+6 >= 0 and index+6 < 64):
                     move = Move(index, index+6, Pieces.Knight, board[index+6])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 2 down 1 right
                 if int((index+17)/8) == row+2 and (index+17)%8 == col+1 and int((index+17)/8) < 8 and Pieces.colorMask & board[index+17] != turn and (index+17 >= 0 and index+17 < 64):
                     move = Move(index, index+17, Pieces.Knight, board[index+17])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 # 2 down 1 left
                 if int((index+15)/8) == row+2 and (index+15)%8 == col-1 and int((index+15)/8) < 8 and Pieces.colorMask & board[index+15] != turn and (index+15 >= 0 and index+15 < 64):
                     move = Move(index, index+15, Pieces.Knight, board[index+15])
                     self.move_piece(move)
-                    if not self.is_in_check(turn, self.board):
-                        moves.append(move)
+                    moves.append(move)
                     self.undo_move(move)
                 continue        
 # ______________________________________________________________________________________________________ #       
@@ -679,8 +686,7 @@ class Board:
                     while ((rank < 8 and rank >= 0 and file < 8 and file >= 0) and (abs(file - startFile) == i and abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64) and ((board[nextSquare] == Pieces.Empty) or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, nextSquare, Pieces.Bishop, board[nextSquare])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                         i += 1
                         if board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask:
@@ -703,8 +709,7 @@ class Board:
                     while (rank < 8 and rank >= 0 and file < 8 and file >= 0 and (abs(file - startFile) == i or abs(rank - startRank) == i) and (abs(file - startFile) + abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64) and (board[nextSquare] == Pieces.Empty or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, index + direction*i, Pieces.Rook, board[index+direction*i])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                         i += 1
                         if board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask:
@@ -728,8 +733,7 @@ class Board:
                     while (rank < 8 and rank >= 0 and file < 8 and file >= 0 and (abs(file - startFile) == i or abs(rank - startRank) == i) and (abs(file - startFile) + abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64) and (board[nextSquare] == Pieces.Empty or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, index + direction*i, Pieces.Queen, board[index+direction*i])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                         i += 1
                         if board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask:
@@ -745,8 +749,7 @@ class Board:
                     while (rank < 8 and rank >= 0 and file < 8 and file >= 0 and (abs(file - startFile) == i and abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64)  and (board[nextSquare] == Pieces.Empty or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, index + direction*i, Pieces.Queen, board[index+direction*i])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                         i += 1
                         if board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask:
@@ -770,8 +773,7 @@ class Board:
                     if (rank < 8 and rank >= 0 and file < 8 and file >= 0 and (abs(file - startFile) == i or abs(rank - startRank) == i) and (abs(file - startFile) + abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64) and (board[nextSquare] == Pieces.Empty or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, index + direction*i, Pieces.King, board[index+direction*i])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 for direction in bishopDirections:
                     i=1
@@ -781,8 +783,7 @@ class Board:
                     if (rank < 8 and rank >= 0 and file < 8 and file >= 0 and (abs(file - startFile) == i and abs(rank - startRank) == i)) and (nextSquare >= 0 and nextSquare < 64)  and (board[nextSquare] == Pieces.Empty or board[nextSquare] & Pieces.colorMask == ~turn & Pieces.colorMask):
                         move = Move(index, index + direction*i, Pieces.King, board[index+direction*i])
                         self.move_piece(move)
-                        if not self.is_in_check(turn, self.board):
-                            moves.append(move)
+                        moves.append(move)
                         self.undo_move(move)
                 continue                            
 # ______________________________________________________________________________________________________ #

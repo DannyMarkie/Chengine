@@ -7,4 +7,11 @@ class RandomBot(Bot):
 
     def get_move(self, board):
         moves = board.generate_legal_moves()
+        indexes = []
+        for index, move in enumerate(moves):
+            if not board.move_is_legal(move, board):
+                indexes.append(index)
+
+        for index in sorted(indexes, reverse=True):
+            del moves[index]
         return random.choice(moves)

@@ -21,7 +21,7 @@ class Match:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(0)
-        while self.winner == None and not len(self.board.generate_legal_moves()) == 0 and (self.movesSinceCapture < 51 and self.movesSincePawnPush < 51):
+        while self.winner == None and self.board.has_legal_moves() and (self.movesSinceCapture < 51 and self.movesSincePawnPush < 51):
             board_clone = Board(fenString=self.board.to_fen())
             if self.board.turn == Pieces.White:
                 move = self.bot1.get_move(board_clone)

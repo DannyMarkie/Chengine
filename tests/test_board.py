@@ -1,6 +1,6 @@
 import sys
-sys.path.insert(1, 'C:/Users/Danny/Documents/Programming/ai/games/pythonChess')
-# sys.path.insert(1, 'C:/Users/danny/Documents/Programming/ChEngine/Chengine')
+# sys.path.insert(1, 'C:/Users/Danny/Documents/Programming/ai/games/pythonChess')
+sys.path.insert(1, 'C:/Users/danny/Documents/Programming/ChEngine/Chengine')
 
 from core.board import Board
 from core.pieces import Pieces
@@ -18,6 +18,8 @@ class TestBoard(unittest.TestCase):
         total = []
         for move in moves:
             board = Board(fenString=fen, render=board.render)
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             if board.render == True:
                 board.update_render()
@@ -40,7 +42,11 @@ class TestBoard(unittest.TestCase):
         moves = []
         if depth == 1:
             lastMoves = board.generate_legal_moves(last_move=lastMove)
-            for move in lastMoves:
+            indexes = []
+            for index, move in enumerate(lastMoves):
+                if not board.move_is_legal(move, board):
+                    indexes.append(index)
+                    continue
                 board.move_piece(move)
                 if board.render == True:
                         board.update_render()
@@ -49,9 +55,13 @@ class TestBoard(unittest.TestCase):
                             if event.type == pygame.QUIT:
                                 sys.exit(0)
                 board.undo_move(move)
+            for index in sorted(indexes, reverse=True):
+                del lastMoves[index]
             return lastMoves
       
         for move in board.generate_legal_moves(last_move=lastMove):
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             if board.render == True:
                 board.update_render()

@@ -24,6 +24,8 @@ class MoveOrderingV2(Bot):
         moves = board.generate_legal_moves()
         sorted_moves = self.order_moves(moves=moves, board=board)
         for move in sorted_moves:
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             if board.is_in_check():
                 extension += 1

@@ -20,6 +20,8 @@ class NegaMaxV1(Bot):
         bestEval = -1000000 if isMaximizingPlayer == 1 else 1000000
         bestMove = lastMove
         for move in board.generate_legal_moves():
+            if not board.move_is_legal(move, board):
+                continue
             board.move_piece(move)
             if board.is_in_check():
                 extension += 1
