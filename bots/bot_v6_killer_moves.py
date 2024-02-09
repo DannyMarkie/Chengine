@@ -112,7 +112,7 @@ class KillerMovesV6(Bot):
 
     def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
         extension = 0
-        if depth == maxDepth or depth == maxDepthExtension or self.thinkTimeOut:
+        if depth == maxDepth or depth == maxDepthExtension:
             evaluation = self.evaluate(board=board)
             return lastMove, evaluation
         
@@ -141,6 +141,8 @@ class KillerMovesV6(Bot):
             if bestEval == evaluation:
                 bestMove = prevBestMove
         for move in sorted_moves:
+            if self.thinkTimeOut:
+                break
             if not board.move_is_legal(move, board):
                 continue
             board.move_piece(move)
@@ -171,6 +173,8 @@ class KillerMovesV6(Bot):
                 if bestEval < alpha:
                     break
                 beta = min(beta, bestEval)
+            if self.thinkTimeOut:
+                break
             if bestEval == evaluation:
                 bestMove = move
         self.transpositionTable[hashValue & self.mask] = [bestMove, bestEval]
