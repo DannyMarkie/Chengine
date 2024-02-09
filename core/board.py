@@ -455,7 +455,7 @@ class Board:
     def is_checkmate(self, turn=None):
         if turn == None:
             turn = self.turn
-        return (self.is_in_check(turn=turn, board=self.board) and self.has_legal_moves())
+        return (self.is_in_check(turn=turn, board=self.board) and not self.has_legal_moves())
 
     def generate_legal_moves(self, last_move=None, board=None, turn=None):
         if board is None:

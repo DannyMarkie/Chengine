@@ -3,8 +3,10 @@ from core.pieces import Pieces
 from core.move import Move
 from core.board import Board
 import time
+import threading
 
 class PieceTablesV4(Bot):
+    thinkTimeOut = False
     pawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     10, 10, 20, 30, 30, 20, 10, 10,
@@ -65,12 +67,18 @@ class PieceTablesV4(Bot):
     def __init__(self, thinkTime=1) -> None:
         self.thinkTime = thinkTime
         super().__init__()
+    
+    def set_timeout(self):
+        self.thinkTimeOut = True
 
     def get_move(self, board):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
         currentDepth = 1
         startTime = time.time()
         move = None
+        t = threading.Timer(self.thinkTime, self.set_timeout)
+        t.daemon = True
+        t.start()
         while time.time() - self.thinkTime < startTime:
             print(currentDepth)
             if move is not None:
@@ -79,6 +87,7 @@ class PieceTablesV4(Bot):
                 move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
         print(f"Eval: {evaluation*isMaximizingPlayer:.1f}")
+        self.thinkTimeOut = False
         return move
 
     def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
@@ -106,6 +115,8 @@ class PieceTablesV4(Bot):
             board.undo_move(prevBestMove)
             extension = 0
         for move in sorted_moves:
+            if self.thinkTimeOut:
+                break
             if not board.move_is_legal(move, board):
                 continue
             board.move_piece(move)
@@ -116,6 +127,8 @@ class PieceTablesV4(Bot):
             thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
             evaluation = -evaluation
             bestEval = max(bestEval, evaluation)
+            if self.thinkTimeOut:
+                break
             if bestEval == evaluation:
                 bestMove = move
             alpha = max(alpha, bestEval)
