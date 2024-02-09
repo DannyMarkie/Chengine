@@ -9,6 +9,7 @@ from bots.bot_v3_iterative_deepening import IterativeDeepeningV3
 from bots.bot_v4_piece_tables import PieceTablesV4
 from bots.bot_v5_transposition_table import TranspositionTableV5
 from bots.bot_v6_killer_moves import KillerMovesV6
+from bots.bot_v7_endgame_piece_tables import PieceTableProgressionV7
 from tests.test_board import TestBoard
 import time
 import cProfile
@@ -22,7 +23,7 @@ winners = []
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=KillerMovesV6(), bot2=KillerMovesV6(), board=Board(render=renderGames))
+    match = Match(bot1=PieceTableProgressionV7(), bot2=KillerMovesV6(), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()
