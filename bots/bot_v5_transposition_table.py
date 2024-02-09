@@ -4,8 +4,10 @@ from core.move import Move
 from core.board import Board
 import time
 import random
+import threading
 
 class TranspositionTableV5(Bot):
+    thinkTimeOut = False
     pawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     10, 10, 20, 30, 30, 20, 10, 10,
@@ -80,12 +82,18 @@ class TranspositionTableV5(Bot):
             if piece != Pieces.Empty:
                 h ^= self.zobrist[index][piece]
         return h
+    
+    def set_timeout(self):
+        self.thinkTimeOut = True
 
     def get_move(self, board=Board()):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
         currentDepth = 1
         startTime = time.time()
         move = None
+        t = threading.Timer(self.thinkTime, self.set_timeout)
+        t.daemon = True
+        t.start()
         while time.time() - self.thinkTime < startTime:
             print(currentDepth)
             self.nodes = 0
@@ -97,6 +105,7 @@ class TranspositionTableV5(Bot):
                 move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+2, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
         print(f"Eval: {evaluation:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nHash Lookups: {self.hashLookups}")
+        self.thinkTimeOut = False
         return move
 
     def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
@@ -130,6 +139,8 @@ class TranspositionTableV5(Bot):
             if bestEval == evaluation:
                 bestMove = prevBestMove
         for move in sorted_moves:
+            if self.thinkTimeOut:
+                break
             if not board.move_is_legal(move, board):
                 continue
             board.move_piece(move)
@@ -159,6 +170,8 @@ class TranspositionTableV5(Bot):
                 if bestEval < alpha:
                     break
                 beta = min(beta, bestEval)
+            if self.thinkTimeOut:
+                break
             if bestEval == evaluation:
                 bestMove = move
         self.transpositionTable[hashValue & self.mask] = [bestMove, bestEval]
