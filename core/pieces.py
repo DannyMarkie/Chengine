@@ -39,11 +39,15 @@ class Pieces:
     def get_piece_value(self, piece):
         if piece == Pieces.Pawn:
             return self.Value.Pawn
-        if piece == Pieces.Bishop or piece == Pieces.Knight:
+        if piece == Pieces.Bishop:
             return self.Value.Bishop
+        if piece == Pieces.Knight:
+            return self.Value.Knight
         if piece == Pieces.Rook:
             return self.Value.Rook
         if piece == Pieces.Queen:
             return self.Value.Queen
         if piece == Pieces.King:
             return self.Value.King
+        if piece == Pieces.Empty:
+            return 0

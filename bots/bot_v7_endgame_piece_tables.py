@@ -5,12 +5,14 @@ from core.board import Board
 import time
 import random
 import threading
+import numpy as np
 
-class KillerMovesV6(Bot):
+class PieceTableProgressionV7(Bot):
     killerBias = 10
     killerMoves = {}
     thinkTimeOut = False
-    pawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
+    maxValue = 48_400 - 40_000
+    bgpawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
                     50, 50, 50, 50, 50, 50, 50, 50,
                     10, 10, 20, 30, 30, 20, 10, 10,
                     5,  5, 10, 25, 25, 10,  5,  5,
@@ -18,6 +20,14 @@ class KillerMovesV6(Bot):
                     5, -5,-10,  0,  0,-10, -5,  5,
                     5, 10, 10,-20,-20, 10, 10,  5,
                     0,  0,  0,  0,  0,  0,  0,  0   ]
+    egpawnTable = [ 0,   0,   0,   0,   0,   0,   0,   0,
+                    178, 173, 158, 134, 147, 132, 165, 187,
+                    94, 100,  85,  67,  56,  53,  82,  84,
+                    32,  24,  13,   5,  -2,   4,  17,  17,
+                    13,   9,  -3,  -7,  -7,  -8,   3,  -1,
+                    4,   7,  -6,   1,   0,  -5,  -1,  -8,
+                    13,   8,   8,  10,  13,   0,   2,  -7,
+                    0,   0,   0,   0,   0,   0,   0,   0    ]
     knightTable = [ -50,-40,-30,-30,-30,-30,-40,-50,
                     -40,-20,  0,  0,  0,  0,-20,-40,
                     -30,  0, 10, 15, 15, 10,  0,-30,
@@ -196,10 +206,15 @@ class KillerMovesV6(Bot):
 
         mobility = len(whiteMoves) - len(blackMoves)
 
+        currentValue = sum([Pieces().get_piece_value(piece=piece & Pieces.pieceMask) for piece in board.board]) - 40_000
+        currentSplit = min(1, currentValue / self.maxValue)
+        currentPawnTable = np.array(self.bgpawnTable) * currentSplit + np.array(self.egpawnTable) * (1 - currentSplit)
+        currentKingTable = np.array(self.mgKingTable) * currentSplit + np.array(self.egKingTable) * (1 - currentSplit)
+
         for index, piece in enumerate(board.board):
             if piece & Pieces.pieceMask == Pieces.Pawn:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Pawn + self.pawnTable[index]) if offset == 1 else offset * (Pieces.Value.Pawn + self.pawnTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Pawn + currentPawnTable[index]) if offset == 1 else offset * (Pieces.Value.Pawn + currentPawnTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Knight:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
                 evaluation += offset * (Pieces.Value.Knight + self.knightTable[index]) if offset == 1 else offset * (Pieces.Value.Knight + self.knightTable[::-1][index])
@@ -214,7 +229,7 @@ class KillerMovesV6(Bot):
                 evaluation += offset * (Pieces.Value.Queen + self.queenTable[index]) if offset == 1 else offset * (Pieces.Value.Queen + self.queenTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.King:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.King + self.mgKingTable[index]) if offset == 1 else offset * (Pieces.Value.King + self.mgKingTable[::-1][index])
+                evaluation += offset * (Pieces.Value.King + currentKingTable[index]) if offset == 1 else offset * (Pieces.Value.King + currentKingTable[::-1][index])
 
         evaluation += (0.1 * mobility)
         
