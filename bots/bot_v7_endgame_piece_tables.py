@@ -76,8 +76,10 @@ class PieceTableProgressionV7(Bot):
                     -30,-10, 20, 30, 30, 20,-10,-30,
                     -30,-30,  0,  0,  0,  0,-30,-30,
                     -50,-30,-30,-30,-30,-30,-30,-50 ]
+    gameStates = {}
 
-    def __init__(self, thinkTime=1.5) -> None:
+
+    def __init__(self, thinkTime=10) -> None:
         self.thinkTime = thinkTime
         self.zobrist = self.init_zobrist()
         self.mask = 0xFFFF_FFFF
@@ -118,6 +120,12 @@ class PieceTableProgressionV7(Bot):
             currentDepth += 1
         print(f"Eval: {evaluation:.1f}\nTime taken: {time.time() - startTime}\nNodes searched: {self.nodes}\nHash Lookups: {self.hashLookups}")
         self.thinkTimeOut = False
+        board.move_piece(move)
+        if str(board.board) in self.gameStates:
+            self.gameStates[str(board.board)] += 1
+        else: 
+            self.gameStates[str(board.board)] = 1
+        board.undo_move(move)
         return move
 
     def search(self, board, maxDepth, depth=0, maxDepthExtension=1, isMaximizingPlayer=1, lastMove=None, alpha=-1000000, beta=1000000, prevBestMove=None):
@@ -156,18 +164,22 @@ class PieceTableProgressionV7(Bot):
             if not board.move_is_legal(move, board):
                 continue
             board.move_piece(move)
-            hashValue ^= self.zobrist[move.startSquare][board.board[move.startSquare]]
-            hashValue ^= self.zobrist[move.endSquare][board.board[move.endSquare]]
-            if not hashValue & self.mask in self.transpositionTable:
-                if board.is_in_check():
-                    extension += 2
-                if move.capturedPiece != Pieces.Empty:
-                    extension += 1
-                self.nodes += 1
-                thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
+            if self.gameStates.get(str(board.board)) == 2:
+                print("Yes")
+                evaluation = 0
             else:
-                self.hashLookups += 1
-                thisMove, evaluation = self.transpositionTable.get(hashValue & self.mask)
+                hashValue ^= self.zobrist[move.startSquare][board.board[move.startSquare]]
+                hashValue ^= self.zobrist[move.endSquare][board.board[move.endSquare]]
+                if not hashValue & self.mask in self.transpositionTable:
+                    if board.is_in_check():
+                        extension += 2
+                    if move.capturedPiece != Pieces.Empty:
+                        extension += 1
+                    self.nodes += 1
+                    thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
+                else:
+                    self.hashLookups += 1
+                    thisMove, evaluation = self.transpositionTable.get(hashValue & self.mask)
             board.undo_move(move)
             hashValue ^= self.zobrist[move.startSquare][board.board[move.startSquare]]
             hashValue ^= self.zobrist[move.endSquare][board.board[move.endSquare]]
