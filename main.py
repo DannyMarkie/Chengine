@@ -16,14 +16,15 @@ import cProfile
 
 numMatches = 1
 renderGames = True
+thinkTime = 1.5
 
 winners = []
 # cProfile.run('KillerMovesV6().get_move()', sort='tottime')
-# cProfile.run('TranspositionTableV5().get_move()', sort='tottime')
+# cProfile.run('PieceTableProgressionV7().get_move()', sort='tottime')
 start_time = time.time()
 print(f"Started playing matches...")
 for game in range(0, numMatches):
-    match = Match(bot1=PieceTableProgressionV7(), bot2=KillerMovesV6(), board=Board(render=renderGames))
+    match = Match(bot1=PieceTableProgressionV7(thinkTime=thinkTime), bot2=PieceTableProgressionV7(thinkTime=thinkTime), board=Board(render=renderGames))
     winner = match.play()
     winners.append(winner)
 end_time = time.time()

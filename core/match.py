@@ -12,8 +12,10 @@ class Match:
         self.winner = None
         self.movesSincePawnPush = 0
         self.movesSinceCapture = 0
+        self.gameStates = {}
 
     def play(self):
+        self.gameStates[str(self.board.board)] = 1
         if self.board.render == True:
             print("Game starting in 2 seconds")
             self.board.update_render()
@@ -21,7 +23,7 @@ class Match:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     sys.exit(0)
-        while self.winner == None and self.board.has_legal_moves() and (self.movesSinceCapture < 51 and self.movesSincePawnPush < 51):
+        while self.winner == None and self.board.has_legal_moves() and (self.movesSinceCapture < 51 and self.movesSincePawnPush < 51) and (self.gameStates.get(str(self.board.board)) < 3):
             board_clone = Board(fenString=self.board.to_fen())
             if self.board.turn == Pieces.White:
                 move = self.bot1.get_move(board_clone)
@@ -45,6 +47,11 @@ class Match:
                 self.movesSincePawnPush = 0
             else:
                 self.movesSincePawnPush += 1
+            # Update gamestates for draw by repetition handling
+            if str(self.board.board) in self.gameStates:
+                self.gameStates[str(self.board.board)] += 1
+            else: 
+                self.gameStates[str(self.board.board)] = 1
             # Update render if necessary
             if self.board.render == True:
                 self.board.update_render()
