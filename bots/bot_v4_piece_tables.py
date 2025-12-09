@@ -5,69 +5,70 @@ from core.board import Board
 import time
 import threading
 
+
 class PieceTablesV4(Bot):
     thinkTimeOut = False
-    pawnTable = [   0,  0,  0,  0,  0,  0,  0,  0,
-                    50, 50, 50, 50, 50, 50, 50, 50,
-                    10, 10, 20, 30, 30, 20, 10, 10,
-                    5,  5, 10, 25, 25, 10,  5,  5,
-                    0,  0,  0, 20, 20,  0,  0,  0,
-                    5, -5,-10,  0,  0,-10, -5,  5,
-                    5, 10, 10,-20,-20, 10, 10,  5,
-                    0,  0,  0,  0,  0,  0,  0,  0   ]
-    knightTable = [ -50,-40,-30,-30,-30,-30,-40,-50,
-                    -40,-20,  0,  0,  0,  0,-20,-40,
-                    -30,  0, 10, 15, 15, 10,  0,-30,
-                    -30,  5, 15, 20, 20, 15,  5,-30,
-                    -30,  0, 15, 20, 20, 15,  0,-30,
-                    -30,  5, 10, 15, 15, 10,  5,-30,
-                    -40,-20,  0,  5,  5,  0,-20,-40,
-                    -50,-40,-30,-30,-30,-30,-40,-50]
-    bishopTable = [ -20,-10,-10,-10,-10,-10,-10,-20,
-                    -10,  0,  0,  0,  0,  0,  0,-10,
-                    -10,  0,  5, 10, 10,  5,  0,-10,
-                    -10,  5,  5, 10, 10,  5,  5,-10,
-                    -10,  0, 10, 10, 10, 10,  0,-10,
-                    -10, 10, 10, 10, 10, 10, 10,-10,
-                    -10,  5,  0,  0,  0,  0,  5,-10,
-                    -20,-10,-10,-10,-10,-10,-10,-20,]
-    rookTable = [   0,  0,  0,  0,  0,  0,  0,  0,
-                    5, 10, 10, 10, 10, 10, 10,  5,
-                    -5,  0,  0,  0,  0,  0,  0, -5,
-                    -5,  0,  0,  0,  0,  0,  0, -5,
-                    -5,  0,  0,  0,  0,  0,  0, -5,
-                    -5,  0,  0,  0,  0,  0,  0, -5,
-                    -5,  0,  0,  0,  0,  0,  0, -5,
-                    0,  0,  0,  5,  5,  0,  0,  0   ]
-    queenTable = [  -20,-10,-10, -5, -5,-10,-10,-20,
-                    -10,  0,  0,  0,  0,  0,  0,-10,
-                    -10,  0,  5,  5,  5,  5,  0,-10,
-                    -5,  0,  5,  5,  5,  5,  0, -5,
-                    0,  0,  5,  5,  5,  5,  0, -5,
-                    -10,  5,  5,  5,  5,  5,  0,-10,
-                    -10,  0,  5,  0,  0,  0,  0,-10,
-                    -20,-10,-10, -5, -5,-10,-10,-20 ]
-    mgKingTable = [ -30,-40,-40,-50,-50,-40,-40,-30,
-                    -30,-40,-40,-50,-50,-40,-40,-30,
-                    -30,-40,-40,-50,-50,-40,-40,-30,
-                    -30,-40,-40,-50,-50,-40,-40,-30,
-                    -20,-30,-30,-40,-40,-30,-30,-20,
-                    -10,-20,-20,-20,-20,-20,-20,-10,
-                    20, 20,  0,  0,  0,  0, 20, 20,
-                    20, 30, 10,  0,  0, 10, 30, 20  ]
-    egKingTable = [ -50,-40,-30,-20,-20,-30,-40,-50,
-                    -30,-20,-10,  0,  0,-10,-20,-30,
-                    -30,-10, 20, 30, 30, 20,-10,-30,
-                    -30,-10, 30, 40, 40, 30,-10,-30,
-                    -30,-10, 30, 40, 40, 30,-10,-30,
-                    -30,-10, 20, 30, 30, 20,-10,-30,
-                    -30,-30,  0,  0,  0,  0,-30,-30,
-                    -50,-30,-30,-30,-30,-30,-30,-50 ]
+    pawnTable = [0,  0,  0,  0,  0,  0,  0,  0,
+                 50, 50, 50, 50, 50, 50, 50, 50,
+                 10, 10, 20, 30, 30, 20, 10, 10,
+                 5,  5, 10, 25, 25, 10,  5,  5,
+                 0,  0,  0, 20, 20,  0,  0,  0,
+                 5, -5, -10,  0,  0, -10, -5,  5,
+                 5, 10, 10, -20, -20, 10, 10,  5,
+                 0,  0,  0,  0,  0,  0,  0,  0]
+    knightTable = [-50, -40, -30, -30, -30, -30, -40, -50,
+                   -40, -20,  0,  0,  0,  0, -20, -40,
+                   -30,  0, 10, 15, 15, 10,  0, -30,
+                   -30,  5, 15, 20, 20, 15,  5, -30,
+                   -30,  0, 15, 20, 20, 15,  0, -30,
+                   -30,  5, 10, 15, 15, 10,  5, -30,
+                   -40, -20,  0,  5,  5,  0, -20, -40,
+                   -50, -40, -30, -30, -30, -30, -40, -50]
+    bishopTable = [-20, -10, -10, -10, -10, -10, -10, -20,
+                   -10,  0,  0,  0,  0,  0,  0, -10,
+                   -10,  0,  5, 10, 10,  5,  0, -10,
+                   -10,  5,  5, 10, 10,  5,  5, -10,
+                   -10,  0, 10, 10, 10, 10,  0, -10,
+                   -10, 10, 10, 10, 10, 10, 10, -10,
+                   -10,  5,  0,  0,  0,  0,  5, -10,
+                   -20, -10, -10, -10, -10, -10, -10, -20,]
+    rookTable = [0,  0,  0,  0,  0,  0,  0,  0,
+                 5, 10, 10, 10, 10, 10, 10,  5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 -5,  0,  0,  0,  0,  0,  0, -5,
+                 0,  0,  0,  5,  5,  0,  0,  0]
+    queenTable = [-20, -10, -10, -5, -5, -10, -10, -20,
+                  -10,  0,  0,  0,  0,  0,  0, -10,
+                  -10,  0,  5,  5,  5,  5,  0, -10,
+                  -5,  0,  5,  5,  5,  5,  0, -5,
+                  0,  0,  5,  5,  5,  5,  0, -5,
+                  -10,  5,  5,  5,  5,  5,  0, -10,
+                  -10,  0,  5,  0,  0,  0,  0, -10,
+                  -20, -10, -10, -5, -5, -10, -10, -20]
+    mgKingTable = [-30, -40, -40, -50, -50, -40, -40, -30,
+                   -30, -40, -40, -50, -50, -40, -40, -30,
+                   -30, -40, -40, -50, -50, -40, -40, -30,
+                   -30, -40, -40, -50, -50, -40, -40, -30,
+                   -20, -30, -30, -40, -40, -30, -30, -20,
+                   -10, -20, -20, -20, -20, -20, -20, -10,
+                   20, 20,  0,  0,  0,  0, 20, 20,
+                   20, 30, 10,  0,  0, 10, 30, 20]
+    egKingTable = [-50, -40, -30, -20, -20, -30, -40, -50,
+                   -30, -20, -10,  0,  0, -10, -20, -30,
+                   -30, -10, 20, 30, 30, 20, -10, -30,
+                   -30, -10, 30, 40, 40, 30, -10, -30,
+                   -30, -10, 30, 40, 40, 30, -10, -30,
+                   -30, -10, 20, 30, 30, 20, -10, -30,
+                   -30, -30,  0,  0,  0,  0, -30, -30,
+                   -50, -30, -30, -30, -30, -30, -30, -50]
 
     def __init__(self, thinkTime=1) -> None:
         self.thinkTime = thinkTime
         super().__init__()
-    
+
     def set_timeout(self):
         self.thinkTimeOut = True
 
@@ -82,9 +83,11 @@ class PieceTablesV4(Bot):
         while time.time() - self.thinkTime < startTime:
             print(currentDepth)
             if move is not None:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
+                move, evaluation = self.search(
+                    board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer, prevBestMove=move)
             else:
-                move, evaluation = self.search(board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer)
+                move, evaluation = self.search(
+                    board=board, maxDepth=currentDepth, maxDepthExtension=currentDepth+1, isMaximizingPlayer=isMaximizingPlayer)
             currentDepth += 1
         print(f"Eval: {evaluation*isMaximizingPlayer:.1f}")
         self.thinkTimeOut = False
@@ -95,7 +98,7 @@ class PieceTablesV4(Bot):
         if depth == maxDepth or depth == maxDepthExtension:
             evaluation = isMaximizingPlayer * self.evaluate(board=board)
             return lastMove, evaluation
-        
+
         bestEval = -1000000
         bestMove = lastMove
         moves = board.generate_legal_moves()
@@ -106,7 +109,8 @@ class PieceTablesV4(Bot):
                 extension += 1
             if prevBestMove.capturedPiece != Pieces.Empty:
                 extension += 1
-            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=prevBestMove)
+            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension,
+                                               isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=prevBestMove)
             evaluation = -evaluation
             bestEval = max(bestEval, evaluation)
             if bestEval == evaluation:
@@ -124,7 +128,8 @@ class PieceTablesV4(Bot):
                 extension += 1
             if move.capturedPiece != Pieces.Empty:
                 extension += 1
-            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
+            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension,
+                                               maxDepthExtension=maxDepthExtension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
             evaluation = -evaluation
             bestEval = max(bestEval, evaluation)
             if self.thinkTimeOut:
@@ -137,7 +142,7 @@ class PieceTablesV4(Bot):
             if beta <= alpha:
                 break
         return bestMove, bestEval
-    
+
     def evaluate(self, board):
         evaluation = 0
         if board.turn == Pieces.White:
@@ -150,47 +155,58 @@ class PieceTablesV4(Bot):
         if board.turn == Pieces.White and len(blackMoves) == 0:
             if board.is_checkmate(turn=Pieces.Black):
                 return 1000000
-            else: return 0
+            else:
+                return 0
         elif board.turn == Pieces.Black and len(whiteMoves) == 0:
             if board.is_checkmate(turn=Pieces.White):
                 return -1000000
-            else: return 0 
+            else:
+                return 0
 
         mobility = len(whiteMoves) - len(blackMoves)
 
         for index, piece in enumerate(board.board):
             if piece & Pieces.pieceMask == Pieces.Pawn:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Pawn + self.pawnTable[index]) if offset == 1 else offset * (Pieces.Value.Pawn + self.pawnTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Pawn + self.pawnTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.Pawn + self.pawnTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Knight:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Knight + self.knightTable[index]) if offset == 1 else offset * (Pieces.Value.Knight + self.knightTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Knight + self.knightTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.Knight + self.knightTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Bishop:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Bishop + self.bishopTable[index]) if offset == 1 else offset * (Pieces.Value.Bishop + self.bishopTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Bishop + self.bishopTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.Bishop + self.bishopTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Rook:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Rook + self.rookTable[index]) if offset == 1 else offset * (Pieces.Value.Rook + self.rookTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Rook + self.rookTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.Rook + self.rookTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.Queen:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.Queen + self.queenTable[index]) if offset == 1 else offset * (Pieces.Value.Queen + self.queenTable[::-1][index])
+                evaluation += offset * (Pieces.Value.Queen + self.queenTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.Queen + self.queenTable[::-1][index])
             if piece & Pieces.pieceMask == Pieces.King:
                 offset = 1 if piece & Pieces.colorMask == Pieces.White else -1
-                evaluation += offset * (Pieces.Value.King + self.mgKingTable[index]) if offset == 1 else offset * (Pieces.Value.King + self.mgKingTable[::-1][index])
+                evaluation += offset * (Pieces.Value.King + self.mgKingTable[index]) if offset == 1 else offset * (
+                    Pieces.Value.King + self.mgKingTable[::-1][index])
 
         evaluation += (0.1 * mobility)
-        
+
         return evaluation / 100
-    
+
     def order_moves(self, moves, board):
         scoreGuesses = [0 for move in moves]
         for index, move in enumerate(moves):
             if move.capturedPiece != Pieces.Empty:
-                scoreGuesses[index] += 10 * Pieces().get_piece_value(move.capturedPiece & Pieces.pieceMask) - Pieces().get_piece_value(move.movedPiece & Pieces.pieceMask)
+                scoreGuesses[index] += 10 * Pieces().get_piece_value(move.capturedPiece & Pieces.pieceMask) - \
+                    Pieces().get_piece_value(move.movedPiece & Pieces.pieceMask)
             if move.flag == Move.Flag.promote:
-                scoreGuesses[index] += Pieces().get_piece_value(move.movedPiece & Pieces.pieceMask)
+                scoreGuesses[index] += Pieces().get_piece_value(move.movedPiece &
+                                                                Pieces.pieceMask)
             if board.target_is_attacked(turn=board.turn, board=board.board, targetSquare=move.endSquare):
-                scoreGuesses[index] -= Pieces().get_piece_value(move.movedPiece & Pieces.pieceMask)
+                scoreGuesses[index] -= Pieces().get_piece_value(move.movedPiece &
+                                                                Pieces.pieceMask)
         tups = zip(scoreGuesses, moves)
         moves = sorted(list(tups), key=lambda x: x[0])
         return [move[1] for move in list(moves)]

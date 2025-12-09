@@ -1,6 +1,7 @@
 from bots.bot import Bot
 import random
 
+
 class RandomBot(Bot):
     def __init__(self) -> None:
         super().__init__()

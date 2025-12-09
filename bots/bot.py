@@ -1,5 +1,6 @@
 from core.pieces import Pieces
 
+
 class Bot:
     def __init__(self) -> None:
         pass

@@ -1,13 +1,15 @@
 from bots.bot import Bot
 from core.pieces import Pieces
 
+
 class NegaMaxV1(Bot):
     def __init__(self) -> None:
         super().__init__()
 
     def get_move(self, board):
         isMaximizingPlayer = 1 if board.turn == Pieces.White else -1
-        move, evaluation = self.search(board=board, maxDepth=4, isMaximizingPlayer=isMaximizingPlayer)
+        move, evaluation = self.search(
+            board=board, maxDepth=4, isMaximizingPlayer=isMaximizingPlayer)
         print(move.startSquare, evaluation*isMaximizingPlayer)
         return move
 
@@ -16,7 +18,7 @@ class NegaMaxV1(Bot):
         if depth == maxDepth or depth == maxExtendedDepth:
             evaluation = self.evaluate(board=board)
             return lastMove, evaluation
-        
+
         bestEval = -1000000 if isMaximizingPlayer == 1 else 1000000
         bestMove = lastMove
         for move in board.generate_legal_moves():
@@ -27,7 +29,8 @@ class NegaMaxV1(Bot):
                 extension += 1
             if move.capturedPiece != Pieces.Empty:
                 extension += 1
-            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension, isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
+            thisMove, evaluation = self.search(board=board, depth=depth+1, maxDepth=maxDepth+extension,
+                                               isMaximizingPlayer=-isMaximizingPlayer, alpha=alpha, beta=beta, lastMove=move)
             board.undo_move(move)
             extension = 0
             if isMaximizingPlayer == 1:
@@ -43,7 +46,7 @@ class NegaMaxV1(Bot):
             if bestEval == evaluation:
                 bestMove = move
         return bestMove, bestEval
-    
+
     def evaluate(self, board):
         evaluation = 0
         if board.turn == Pieces.White:
@@ -56,11 +59,13 @@ class NegaMaxV1(Bot):
         if board.turn == Pieces.White and len(blackMoves) == 0:
             if board.is_checkmate(turn=Pieces.Black):
                 return 1000000
-            else: return 0
+            else:
+                return 0
         elif board.turn == Pieces.Black and len(whiteMoves) == 0:
             if board.is_checkmate(turn=Pieces.White):
                 return -1000000
-            else: return 0 
+            else:
+                return 0
 
         mobility = len(whiteMoves) - len(blackMoves)
 
@@ -86,5 +91,5 @@ class NegaMaxV1(Bot):
 
         # print(0.1*mobility, evaluation)
         evaluation += (0.05 * mobility)
-        
+
         return evaluation / 100
