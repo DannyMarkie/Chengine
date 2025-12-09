@@ -1,5 +1,6 @@
 import pygame
 
+
 class Assets:
     whitePawn = pygame.image.load('./assets/whitePawn.png')
     whiteQueen = pygame.image.load('./assets/whiteQueen.png')

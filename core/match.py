@@ -4,6 +4,7 @@ import pygame
 import sys
 import time
 
+
 class Match:
     def __init__(self, bot1, bot2, board=Board()) -> None:
         self.bot1 = bot1
@@ -39,7 +40,7 @@ class Match:
                     break
             # Update moves since captured piece
             if move.capturedPiece == Pieces.Empty:
-                    self.movesSinceCapture += 1
+                self.movesSinceCapture += 1
             else:
                 self.movesSinceCapture = 0
             # Update moves since pawn push
@@ -50,7 +51,7 @@ class Match:
             # Update gamestates for draw by repetition handling
             if str(self.board.board) in self.gameStates:
                 self.gameStates[str(self.board.board)] += 1
-            else: 
+            else:
                 self.gameStates[str(self.board.board)] = 1
             # Update render if necessary
             if self.board.render == True:

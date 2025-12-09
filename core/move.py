@@ -1,5 +1,6 @@
 from core.pieces import Pieces
 
+
 class Move:
     class Flag:
         en_passant = 1
@@ -15,6 +16,6 @@ class Move:
 
     def __eq__(self, __value: object) -> bool:
         return self.startSquare == __value.startSquare and self.endSquare == __value.endSquare and self.movedPiece == __value.movedPiece and self.capturedPiece == __value.capturedPiece and self.flag == __value.flag
-    
+
     def __hash__(self) -> int:
         return hash(self.startSquare + self.endSquare + self.movedPiece + self.capturedPiece + self.flag)
